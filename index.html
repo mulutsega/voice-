@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title> voice Recorder</title>
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Permanent+Marker&display=swap");
+
+      body {
+        font-size: 15px;
+        background-color: rgb(235, 235, 235);
+      }
+
+      /* used to set default load to show Option A until toggled */
+      .hidden {
+        display: none;
+      }
+
+      .inactive {
+        background-color: #ffffff !important;
+        color: #000000 !important;
+        cursor: default !important;
+      }
+
+      h1 {
+        font-family: Georgia, serif;
+        font-size: 40px;
+        color: #000000;
+        display: flex;
+        justify-content: center;
+        margin-top: 150px;
+      }
+
+      /* recorder buttons start */
+      .audio-record {
+        padding: 10px 10px 20px 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      #recordButton {
+        text-transform: none;
+        letter-spacing: 4px;
+        font-weight: bold;
+        font-size: 18px;
+        color: #1e1014;
+        background: #c8e6cc;
+        border: none;
+        transition: all 0.3s ease-in-out 0s;
+        cursor: pointer;
+        padding: 30px;
+       border-radius: 5px;
+
+      }
+
+      .button-animate {
+        animation: pulse 1s infinite;
+      }
+
+      @keyframes pulse {
+        0% {
+          box-shadow: 0px 0px 3px 1px #7eda88;
+        }
+
+        100% {
+          box-shadow: 0px 0px 3px 10px #7eda88;
+        }
+      }
+
+      #stopButton {
+        text-transform:none;
+        letter-spacing: 4px;
+        font-size: 18px;
+        font-weight: bold;
+        color: #000000;
+        background-color: #f8333c;
+        border: none;
+        border-radius: 5px;
+        padding: 30px;
+        margin: 0 40px;
+        cursor: pointer;
+      }
+
+      .playback {
+        display: flex;
+        justify-content: center;
+        margin-bottom: 20px;
+      }
+
+      #audio-playback {
+        width: 600px;
+        height: 50px;
+      }
+
+      audio::-webkit-media-controls-panel,
+      video::-webkit-media-controls-panel {
+        background-color: #fff;
+      }
+
+
+
+      /* recorder buttons end */
+
+      @media all and (max-width: 643px) {
+        .audio-record {
+          flex-direction: column;
+          align-items: center;
+        }
+
+        #stopButton {
+          margin: 20px 0;
+        }
+      }
+
+      p.lead {
+        color: #fff;
+        font-size: 1.5rem;
+        font-weight: 300;
+        text-align: center;
+      }
+    </style>
+  </head>
+  <body>
+        <div id="carbon-block"></div>
+        <div class="jquery-script-ads">
+          <script type="text/javascript">
+          </script>
+        </div>
+        <div class="jquery-script-clear"></div>
+      </div>
+    </div>
+    <h1>Record Here </h1>
+    <div class="audio-record">
+      <button id="recordButton"><i id='fas fa-microphone'></i>Start Record</button>
+      <button id="stopButton" class="inactive">Stop</button>
+    </div>
+
+    <div class="playback">
+      <audio src="" controls id="audio-playback" class="hidden"></audio>
+    </div>
+      </div>
+    </div>
+    
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script type="text/javascript">
+      var _gaq = _gaq || [];
+      _gaq.push(["_setAccount", "UA-36251023-1"]);
+      _gaq.push(["_setDomainName", "jqueryscript.net"]);
+      _gaq.push(["_trackPageview"]);
+
+      (function () {
+        var ga = document.createElement("script");
+        ga.type = "text/javascript";
+        ga.async = true;
+        ga.src =
+          ("https:" == document.location.protocol
+            ? "https://ssl"
+            : "http://www") + ".google-analytics.com/ga.js";
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(ga, s);
+      })();
+    </script>
+    <script>
+      try {
+        fetch(
+          new Request(
+            "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js",
+            { method: "HEAD", mode: "no-cors" }
+          )
+        )
+          .then(function (response) {
+            return true;
+          })
+          .catch(function (e) {
+            var carbonScript = document.createElement("script");
+            carbonScript.src =
+              "//cdn.carbonads.com/carbon.js?serve=CK7DKKQU&placement=wwwjqueryscriptnet";
+            carbonScript.id = "_carbonads_js";
+            document.getElementById("carbon-block").appendChild(carbonScript);
+          });
+      } catch (error) {
+        console.log(error);
+      }
+      // audio recorder
+      let recorder, audio_stream;
+      const recordButton = document.getElementById("recordButton");
+      recordButton.addEventListener("click", startRecording);
+
+      // stop recording
+      const stopButton = document.getElementById("stopButton");
+      stopButton.addEventListener("click", stopRecording);
+      stopButton.disabled = true;
+
+      // preview recording 
+      const preview = document.getElementById("audio-playback");
+
+      // set download button event
+
+
+      function startRecording() {
+        // button settings
+        recordButton.disabled = true;
+        recordButton.innerText = "Recording...";
+        $("#recordButton").addClass("button-animate");
+
+        $("#stopButton").removeClass("inactive");
+        stopButton.disabled = false;
+
+        if (!$("#audio-playback").hasClass("hidden")) {
+          $("#audio-playback").addClass("hidden");
+        }
+
+        if (!$("#downloadContainer").hasClass("hidden")) {
+          $("#downloadContainer").addClass("hidden");
+        }
+
+        navigator.mediaDevices
+          .getUserMedia({ audio: true })
+          .then(function (stream) {
+            audio_stream = stream;
+            recorder = new MediaRecorder(stream);
+
+            // when there is data, compile into object for preview src
+            recorder.ondataavailable = function (e) {
+              const url = URL.createObjectURL(e.data);
+              preview.src = url;
+
+              // set link href as blob url, replaced instantly if re-recorded
+              downloadAudio.href = url;
+            };
+            recorder.start();
+
+            timeout_status = setTimeout(function () {
+              console.log("5 min timeout");
+              stopRecording();
+            }, 300000);
+          });
+      }
+
+      function stopRecording() {
+        recorder.stop();
+        audio_stream.getAudioTracks()[0].stop();
+
+        // buttons reset
+        recordButton.disabled = false;
+        recordButton.innerText = "Redo Recording";
+        $("#recordButton").removeClass("button-animate");
+
+        $("#stopButton").addClass("inactive");
+        stopButton.disabled = true;
+
+        $("#audio-playback").removeClass("hidden");
+
+        $("#downloadContainer").removeClass("hidden");
+      }
+
+      function downloadRecording() {
+        var name = new Date();
+        var res = name.toISOString().slice(0, 10);
+        downloadAudio.download = res + ".wav";
+      }
+    </script>
+  </body>
+</html>
